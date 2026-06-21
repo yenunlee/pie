@@ -195,7 +195,7 @@ export default function EditionLibraryPanel({
                 {busy ? '처리 중…' : '현재 에디션 저장'}
               </Button>
               <p className="text-[11px] leading-relaxed text-gray-400">
-                초록·인터뷰·설정이 함께 저장됩니다. 사진은 data URL이면 자동으로 Storage에 올리고 공개 URL로 바꿉니다.
+                초록·인터뷰·스타일·메타데이터·페이지 나누기가 함께 저장됩니다. 사진은 data URL이면 자동으로 Storage에 올리고 공개 URL로 바꿉니다.
               </p>
             </div>
           )}

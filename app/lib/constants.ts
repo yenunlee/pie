@@ -48,6 +48,7 @@ export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   abstractCardPaddingTop: 72,
   abstractCardPaddingX: 64,
   abstractFooterLabelFontSize: 20,
+  showPageIndicators: false,
 };
 
 /** Reserve for pagination / page split (dots strip + margins). Mirrors card layout approximation. */

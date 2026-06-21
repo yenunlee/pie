@@ -12,6 +12,9 @@ export interface GlobalSettings {
   intervieweeName: string;
   intervieweeAffiliation: string;
   unitLabel: string;
+  /** Square cover hero image on the first carousel card. */
+  coverPhotoUrl: string | null;
+  /** Circular interviewee avatar in Q&A bubbles. */
   photoUrl: string | null;
 }
 
@@ -44,6 +47,8 @@ export interface DesignSettings {
   abstractCardPaddingTop: number;
   abstractCardPaddingX: number;
   abstractFooterLabelFontSize: number;
+  /** Carousel dots on cover + interview cards, and card counters in the editor preview. */
+  showPageIndicators: boolean;
 }
 
 export interface AbstractData {
@@ -52,6 +57,8 @@ export interface AbstractData {
 
 export interface InterviewData {
   messages: MessageBlock[];
+  /** Message ids after which a manual page break is forced. */
+  pageBreaksAfter?: string[];
 }
 
 export interface AppState {

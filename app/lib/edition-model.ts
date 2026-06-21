@@ -30,6 +30,12 @@ export function coerceLoadedAppState(raw: unknown): AppState | null {
       intervieweeAffiliation: typeof s.global.intervieweeAffiliation === 'string'
         ? s.global.intervieweeAffiliation : '',
       unitLabel: typeof s.global.unitLabel === 'string' ? s.global.unitLabel : '',
+      coverPhotoUrl:
+        s.global.coverPhotoUrl === null || s.global.coverPhotoUrl === undefined
+          ? null
+          : typeof s.global.coverPhotoUrl === 'string'
+            ? s.global.coverPhotoUrl
+            : null,
       photoUrl:
         s.global.photoUrl === null || s.global.photoUrl === undefined
           ? null
@@ -47,6 +53,9 @@ export function coerceLoadedAppState(raw: unknown): AppState | null {
         role: m?.role === 'interviewee' ? 'interviewee' : 'interviewer',
         content: typeof m?.content === 'string' ? m.content : '',
       })),
+      pageBreaksAfter: Array.isArray(s.interview.pageBreaksAfter)
+        ? s.interview.pageBreaksAfter.filter((id): id is string => typeof id === 'string')
+        : [],
     },
   };
 }

@@ -4,12 +4,15 @@ import { getSupabaseAdmin } from '@/app/lib/supabase/server-client';
 
 const MAX = 5 * 1024 * 1024;
 
-function extFromMime(mime: string): string | null {
-  if (mime === 'image/jpeg' || mime === 'image/jpg') return 'jpg';
-  if (mime === 'image/png') return 'png';
-  if (mime === 'image/webp') return 'webp';
-  if (mime === 'image/gif') return 'gif';
-  return null;
+function extFromFile(file: File): string | null {
+  if (file.type === 'image/jpeg' || file.type === 'image/jpg') return 'jpg';
+  if (file.type === 'image/png') return 'png';
+  if (file.type === 'image/webp') return 'webp';
+  if (file.type === 'image/gif') return 'gif';
+  const match = file.name.match(/\.(jpe?g|png|webp|gif)$/i);
+  if (!match) return null;
+  const ext = match[1].toLowerCase();
+  return ext === 'jpeg' ? 'jpg' : ext;
 }
 
 export async function POST(req: Request) {
@@ -26,6 +29,9 @@ export async function POST(req: Request) {
   }
 
   const file = form.get('file');
+  const folderRaw = form.get('folder');
+  const folder =
+    folderRaw === 'profiles' ? 'profiles' : 'covers';
   if (!(file instanceof File) || file.size < 1) {
     return NextResponse.json({ error: 'missing_file' }, { status: 400 });
   }
@@ -33,13 +39,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'file_too_large' }, { status: 400 });
   }
 
-  const ext = extFromMime(file.type);
+  const ext = extFromFile(file);
   if (!ext) {
     return NextResponse.json({ error: 'unsupported_type' }, { status: 400 });
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
-  const path = `covers/${randomUUID()}.${ext}`;
+  const path = `${folder}/${randomUUID()}.${ext}`;
   const contentType = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
 
   const { error } = await supabase.storage.from('pie-card-news').upload(path, buf, {

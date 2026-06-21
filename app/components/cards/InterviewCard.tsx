@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
 import { DesignSettings, MessageBlock } from '@/app/lib/types';
 import { COLORS, DEFAULT_DESIGN_SETTINGS } from '@/app/lib/constants';
 import HighlightedText from '@/app/lib/HighlightedText';
+import InlineMarkupEditor from '@/app/components/editor/InlineMarkupEditor';
 
 interface InterviewCardProps {
   messages: MessageBlock[];
@@ -10,14 +13,37 @@ interface InterviewCardProps {
   photoUrl: string | null;
   volume: string;
   design?: DesignSettings;
+  editable?: boolean;
+  selectedMessageId?: string | null;
+  onMessageSelect?: (id: string) => void;
+  onClearSelection?: () => void;
+  onMessageChange?: (id: string, content: string) => void;
+  onMessageParagraphBreak?: (id: string, before: string, after: string) => void;
+  onMessageSplitParts?: (id: string, parts: string[]) => void;
 }
 
-export default function InterviewCard({ messages, pageIndex, totalPages, photoUrl, volume, design = DEFAULT_DESIGN_SETTINGS }: InterviewCardProps) {
+export default function InterviewCard({
+  messages,
+  pageIndex,
+  totalPages,
+  photoUrl,
+  volume,
+  design = DEFAULT_DESIGN_SETTINGS,
+  editable = false,
+  selectedMessageId = null,
+  onMessageSelect,
+  onClearSelection,
+  onMessageChange,
+  onMessageParagraphBreak,
+  onMessageSplitParts,
+}: InterviewCardProps) {
   void volume;
   const effectiveDesign = { ...DEFAULT_DESIGN_SETTINGS, ...design };
 
   return (
-    <div style={{
+    <div
+      onClick={editable ? onClearSelection : undefined}
+      style={{
       width: '100%',
       height: '100%',
       backgroundColor: '#ffffff',
@@ -25,7 +51,6 @@ export default function InterviewCard({ messages, pageIndex, totalPages, photoUr
       flexDirection: 'column',
       boxSizing: 'border-box',
     }}>
-      {/* Messages */}
       <div style={{
         flex: 1,
         padding: `${effectiveDesign.interviewContentPaddingTop}px ${effectiveDesign.interviewContentPaddingX}px ${effectiveDesign.interviewContentPaddingBottom}px ${effectiveDesign.interviewContentPaddingX}px`,
@@ -34,44 +59,63 @@ export default function InterviewCard({ messages, pageIndex, totalPages, photoUr
         gap: effectiveDesign.interviewBubbleGap,
         overflow: 'hidden',
       }}>
-        {messages.map((msg) => (
+        {messages.map((msg, index) => {
+          const prev = messages[index - 1];
+          const isContinuation = msg.role === 'interviewee' && prev?.role === 'interviewee';
+          const showAvatar = msg.role === 'interviewee' && !isContinuation;
+          const isSelected = selectedMessageId === msg.id;
+          const isInterviewer = msg.role === 'interviewer';
+
+          return (
           <div
             key={msg.id}
             style={{
               display: 'flex',
-              flexDirection: msg.role === 'interviewer' ? 'row-reverse' : 'row',
+              flexDirection: isInterviewer ? 'row-reverse' : 'row',
               alignItems: 'flex-start',
               gap: 12,
+              marginTop: isContinuation ? -Math.round(effectiveDesign.interviewBubbleGap * 0.35) : 0,
             }}
           >
-            {/* Avatar for interviewee */}
             {msg.role === 'interviewee' && (
-              <div style={{
-                width: effectiveDesign.avatarSize,
-                height: effectiveDesign.avatarSize,
-                borderRadius: '50%',
-                overflow: 'hidden',
-                flexShrink: 0,
-                marginTop: 6,
-                backgroundColor: '#ccc',
-                display: 'flex',
-              }}>
-                {photoUrl ? (
-                  <img src={photoUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', backgroundColor: '#b0c8e0' }} />
-                )}
-              </div>
+              showAvatar ? (
+                <div style={{
+                  width: effectiveDesign.avatarSize,
+                  height: effectiveDesign.avatarSize,
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  marginTop: 6,
+                  backgroundColor: '#ccc',
+                  display: 'flex',
+                }}>
+                  {photoUrl ? (
+                    <img
+                      src={photoUrl}
+                      alt="avatar"
+                      loading="eager"
+                      decoding="sync"
+                      {...(/^https?:\/\//i.test(photoUrl) ? { crossOrigin: 'anonymous' as const } : {})}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', backgroundColor: '#b0c8e0' }} />
+                  )}
+                </div>
+              ) : (
+                <div style={{ width: effectiveDesign.avatarSize, flexShrink: 0 }} aria-hidden />
+              )
             )}
 
-            {/* Bubble */}
-            <div style={{
+            <div
+              onClick={editable ? e => { e.stopPropagation(); onMessageSelect?.(msg.id); } : undefined}
+              style={{
               display: 'block',
               maxWidth: '72%',
-              alignSelf: msg.role === 'interviewer' ? 'flex-end' : 'flex-start',
-              backgroundColor: msg.role === 'interviewer' ? effectiveDesign.interviewerBubbleColor : effectiveDesign.intervieweeBubbleColor,
+              alignSelf: isInterviewer ? 'flex-end' : 'flex-start',
+              backgroundColor: isInterviewer ? effectiveDesign.interviewerBubbleColor : effectiveDesign.intervieweeBubbleColor,
               border: msg.role === 'interviewee' ? `1px solid ${COLORS.intervieweeBubbleBorder}` : 'none',
-              borderRadius: msg.role === 'interviewer' ? '22px 5px 22px 22px' : '5px 22px 22px 22px',
+              borderRadius: isInterviewer ? '22px 5px 22px 22px' : '5px 22px 22px 22px',
               padding: `${effectiveDesign.interviewBubblePaddingY}px ${effectiveDesign.interviewBubblePaddingX}px`,
               fontSize: effectiveDesign.interviewTextSize,
               fontWeight: 600,
@@ -81,15 +125,41 @@ export default function InterviewCard({ messages, pageIndex, totalPages, photoUr
               whiteSpace: 'pre-wrap',
               wordBreak: 'keep-all',
               overflowWrap: 'break-word',
+              cursor: editable ? 'text' : undefined,
+              boxShadow: isSelected ? '0 0 0 2px rgba(17,24,39,0.35)' : undefined,
+              transition: 'box-shadow 0.15s ease',
             }}>
-              <HighlightedText text={msg.content} />
+              {isSelected ? (
+                <InlineMarkupEditor
+                  value={msg.content}
+                  onChange={content => onMessageChange?.(msg.id, content)}
+                  onParagraphBreak={({ before, after }) =>
+                    onMessageParagraphBreak?.(msg.id, before, after)
+                  }
+                  onSplitParagraphs={parts => onMessageSplitParts?.(msg.id, parts)}
+                  placeholder={isInterviewer ? '질문을 입력하세요…' : '답변을 입력하세요…'}
+                  autoFocus
+                  style={{
+                    fontSize: effectiveDesign.interviewTextSize,
+                    fontWeight: 600,
+                    lineHeight: 1.75,
+                    letterSpacing: '-0.02em',
+                    color: COLORS.textPrimary,
+                    minHeight: '1.75em',
+                  }}
+                />
+              ) : (
+                <HighlightedText
+                  text={msg.content.trim() || (editable ? (isInterviewer ? '클릭하여 질문 입력' : '클릭하여 답변 입력') : '')}
+                />
+              )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Footer dot indicator */}
-      {totalPages > 1 && (
+      {effectiveDesign.showPageIndicators && totalPages > 1 && (
         <div style={{
           padding: '16px 0 24px 0',
           display: 'flex',

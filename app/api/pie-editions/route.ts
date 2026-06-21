@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/app/lib/supabase/server-client';
 import {
   normalizeStateForPersist,
-  remotePhotoUrl,
+  remoteImageUrl,
 } from '@/app/lib/edition-helpers';
 import { isPieStateJson } from '@/app/lib/edition-model';
 
@@ -45,10 +45,13 @@ export async function POST(req: Request) {
 
   let state = normalizeStateForPersist(b.state);
   try {
-    const uploaded = await remotePhotoUrl(supabase, state.global.photoUrl);
+    const [coverPhotoUrl, photoUrl] = await Promise.all([
+      remoteImageUrl(supabase, state.global.coverPhotoUrl, 'covers'),
+      remoteImageUrl(supabase, state.global.photoUrl, 'profiles'),
+    ]);
     state = {
       ...state,
-      global: { ...state.global, photoUrl: uploaded },
+      global: { ...state.global, coverPhotoUrl, photoUrl },
     };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'photo_upload_failed';

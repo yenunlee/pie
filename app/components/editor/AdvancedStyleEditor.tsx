@@ -17,11 +17,31 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
     onDesignChange({ ...d, [key]: value });
   };
 
+  const applyPreset = (settings: Partial<DesignSettings>) => {
+    onDesignChange({ ...d, ...settings });
+  };
+
   return (
     <div className="space-y-6">
       <p className="text-xs text-gray-400">
-        프리셋·Cover·초록(Abstract)·인터뷰 말풍선을 조정합니다. 미리보기·내보내기 PNG에 동일하게 반영됩니다.
+        프리셋·Cover·초록(Abstract)·인터뷰 말풍선을 조정합니다. 변경 사항은 브라우저에 자동 저장되며, 라이브러리에서 클라우드 저장할 수 있습니다.
       </p>
+
+      <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+        <div className="mb-2">
+          <div className="text-xs font-bold text-gray-700">표시</div>
+          <div className="text-[11px] text-gray-400">카드 하단 페이지 표시</div>
+        </div>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            className="size-4 rounded border-gray-300"
+            checked={d.showPageIndicators}
+            onChange={e => updateDesign('showPageIndicators', e.target.checked)}
+          />
+          페이지 번호 · 캐러셀 점 표시
+        </label>
+      </div>
 
       <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
         <div className="mb-2">
@@ -33,7 +53,7 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
             <button
               key={preset.name}
               type="button"
-              onClick={() => onDesignChange(mergeDesignSettings(preset.settings))}
+              onClick={() => applyPreset(preset.settings)}
               className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
             >
               {preset.name}

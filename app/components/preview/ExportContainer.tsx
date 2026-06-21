@@ -6,6 +6,11 @@ import { CARD_WIDTH, CARD_HEIGHT } from '@/app/lib/constants';
 import CoverCard from '@/app/components/cards/CoverCard';
 import AbstractCard from '@/app/components/cards/AbstractCard';
 import InterviewCard from '@/app/components/cards/InterviewCard';
+import {
+  EXPORT_ABSTRACT_ID,
+  EXPORT_COVER_ID,
+  exportInterviewSlotId,
+} from '@/app/lib/export/export-slot-ids';
 
 interface ExportContainerProps {
   state: AppState;
@@ -19,12 +24,12 @@ function ExportSlot({ id, children }: { id: string; children: React.ReactNode })
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
-        fontFamily: "'Noto Sans KR', sans-serif",
-        position: 'absolute',
-        top: 0,
-        left: 0,
+        fontFamily: "var(--font-noto-sans-kr), 'Noto Sans KR', sans-serif",
+        position: 'relative',
         overflow: 'hidden',
         backgroundColor: '#ffffff',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
       }}
     >
       {children}
@@ -38,34 +43,42 @@ export default function ExportContainer({ state, interviewPages }: ExportContain
       aria-hidden="true"
       style={{
         position: 'fixed',
-        top: -9999,
-        left: -9999,
+        top: -100000,
+        left: -100000,
         pointerEvents: 'none',
-        opacity: 0,
+        opacity: 1,
+        zIndex: -1,
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
       }}
     >
-      <div style={{ position: 'relative', width: CARD_WIDTH, height: CARD_HEIGHT }}>
-        <ExportSlot id="export-cover">
-          <CoverCard settings={state.global} />
-        </ExportSlot>
-      </div>
-      <div style={{ position: 'relative', width: CARD_WIDTH, height: CARD_HEIGHT }}>
-        <ExportSlot id="export-abstract">
-          <AbstractCard settings={state.global} text={state.abstract.text} />
-        </ExportSlot>
-      </div>
+      <ExportSlot id={EXPORT_COVER_ID}>
+        <CoverCard settings={state.global} design={state.design} />
+      </ExportSlot>
+
+      <ExportSlot id={EXPORT_ABSTRACT_ID}>
+        <AbstractCard
+          settings={state.global}
+          text={state.abstract.text}
+          design={state.design}
+          editable={false}
+        />
+      </ExportSlot>
+
       {interviewPages.map((page, i) => (
-        <div key={i} style={{ position: 'relative', width: CARD_WIDTH, height: CARD_HEIGHT }}>
-          <ExportSlot id={`export-interview-${String(i + 1).padStart(2, '0')}`}>
-            <InterviewCard
-              messages={page.messages}
-              pageIndex={page.pageIndex}
-              totalPages={interviewPages.length}
-              photoUrl={state.global.photoUrl}
-              volume={state.global.volume}
-            />
-          </ExportSlot>
-        </div>
+        <ExportSlot key={page.pageIndex} id={exportInterviewSlotId(i)}>
+          <InterviewCard
+            messages={page.messages}
+            pageIndex={page.pageIndex}
+            totalPages={interviewPages.length}
+            photoUrl={state.global.photoUrl}
+            volume={state.global.volume}
+            design={state.design}
+            editable={false}
+          />
+        </ExportSlot>
       ))}
     </div>
   );

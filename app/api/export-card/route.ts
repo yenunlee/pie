@@ -6,9 +6,10 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import { CARD_WIDTH, CARD_HEIGHT } from '@/app/lib/constants';
 import CoverCard from '@/app/components/cards/CoverCard';
-import AbstractCard from '@/app/components/cards/AbstractCard';
-import InterviewCard from '@/app/components/cards/InterviewCard';
+import AbstractCardView from '@/app/components/cards/AbstractCardView';
+import InterviewCardView from '@/app/components/cards/InterviewCardView';
 import type { DesignSettings, GlobalSettings, MessageBlock } from '@/app/lib/types';
+import { embedGlobalImages, remoteUrlToDataUrl } from '@/app/lib/export/embed-export-images';
 
 export const runtime = 'nodejs';
 
@@ -29,13 +30,23 @@ async function loadFonts() {
 }
 
 type CardPayload =
-  | { type: 'cover'; settings: GlobalSettings; design?: DesignSettings }
-  | { type: 'abstract'; settings: GlobalSettings; text: string; design?: DesignSettings }
-  | { type: 'interview'; messages: MessageBlock[]; pageIndex: number; totalPages: number; photoUrl: string | null; volume: string; design?: DesignSettings };
+  | { type: 'cover'; settings: GlobalSettings; design?: DesignSettings; scale?: number }
+  | { type: 'abstract'; settings: GlobalSettings; text: string; design?: DesignSettings; scale?: number }
+  | {
+      type: 'interview';
+      messages: MessageBlock[];
+      pageIndex: number;
+      totalPages: number;
+      photoUrl: string | null;
+      volume: string;
+      design?: DesignSettings;
+      scale?: number;
+    };
 
 export async function POST(request: NextRequest) {
   try {
     const payload = (await request.json()) as CardPayload;
+    const scale = Math.min(4, Math.max(1, Number(payload.scale ?? 3)));
 
     if (!fontsCache) {
       fontsCache = await loadFonts();
@@ -44,15 +55,21 @@ export async function POST(request: NextRequest) {
     let element: React.ReactElement;
 
     if (payload.type === 'cover') {
-      element = React.createElement(CoverCard, { settings: payload.settings, design: payload.design });
+      const settings = await embedGlobalImages(payload.settings);
+      element = React.createElement(CoverCard, { settings, design: payload.design });
     } else if (payload.type === 'abstract') {
-      element = React.createElement(AbstractCard, { settings: payload.settings, text: payload.text, design: payload.design });
+      element = React.createElement(AbstractCardView, {
+        settings: payload.settings,
+        text: payload.text ?? '',
+        design: payload.design,
+      });
     } else if (payload.type === 'interview') {
-      element = React.createElement(InterviewCard, {
+      const photoUrl = await remoteUrlToDataUrl(payload.photoUrl);
+      element = React.createElement(InterviewCardView, {
         messages: payload.messages,
         pageIndex: payload.pageIndex,
         totalPages: payload.totalPages,
-        photoUrl: payload.photoUrl,
+        photoUrl,
         volume: payload.volume,
         design: payload.design,
       });
@@ -67,7 +84,7 @@ export async function POST(request: NextRequest) {
     });
 
     const resvg = new Resvg(svg, {
-      fitTo: { mode: 'width', value: CARD_WIDTH },
+      fitTo: { mode: 'width', value: CARD_WIDTH * scale },
     });
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
@@ -78,6 +95,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error('[export-card]', err);
-    return new Response(String(err), { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return new Response(message, { status: 500 });
   }
 }

@@ -8,7 +8,8 @@ interface CoverCardProps {
 }
 
 export default function CoverCard({ settings, design = DEFAULT_DESIGN_SETTINGS }: CoverCardProps) {
-  const { volume, issueDate, intervieweeName, intervieweeAffiliation, unitLabel, photoUrl } = settings;
+  const { volume, issueDate, intervieweeName, intervieweeAffiliation, unitLabel, coverPhotoUrl, photoUrl } = settings;
+  const coverImage = coverPhotoUrl ?? photoUrl;
   const effectiveDesign = { ...DEFAULT_DESIGN_SETTINGS, ...design };
   const textScale = effectiveDesign.coverTextSize / DEFAULT_DESIGN_SETTINGS.coverTextSize;
 
@@ -30,10 +31,13 @@ export default function CoverCard({ settings, design = DEFAULT_DESIGN_SETTINGS }
 
       {/* Photo block */}
       <div style={{ width: 888, height: 888, position: 'relative', margin: '34px 96px 0 96px', overflow: 'hidden', display: 'flex', backgroundColor: '#D6E8F7' }}>
-        {photoUrl ? (
+        {coverImage ? (
           <img
-            src={photoUrl}
+            src={coverImage}
             alt="interviewee"
+            loading="eager"
+            decoding="sync"
+            {...(/^https?:\/\//i.test(coverImage) ? { crossOrigin: 'anonymous' as const } : {})}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
@@ -65,19 +69,21 @@ export default function CoverCard({ settings, design = DEFAULT_DESIGN_SETTINGS }
         <span style={{ fontSize: 50 * textScale, fontWeight: 800, color: '#000000', lineHeight: 1, letterSpacing: '-0.02em' }}>
           {unitLabel || 'Unit:ie'}
         </span>
-        <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: i === 0 ? 10 : 7,
-                height: i === 0 ? 10 : 7,
-                borderRadius: 999,
-                backgroundColor: i === 0 ? '#ffffff' : 'rgba(255,255,255,0.65)',
-              }}
-            />
-          ))}
-        </div>
+        {effectiveDesign.showPageIndicators && (
+          <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: i === 0 ? 10 : 7,
+                  height: i === 0 ? 10 : 7,
+                  borderRadius: 999,
+                  backgroundColor: i === 0 ? '#ffffff' : 'rgba(255,255,255,0.65)',
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

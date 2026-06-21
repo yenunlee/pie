@@ -13,16 +13,17 @@ export function normalizeStateForPersist(state: AppState): AppState {
   };
 }
 
-/** Upload legacy data-URL photos to Storage; returns https public URL or original if already remote/null. */
-export async function remotePhotoUrl(
+/** Upload legacy data-URL images to Storage; returns https public URL or original if already remote/null. */
+export async function remoteImageUrl(
   supabase: SupabaseClient,
-  photoUrl: string | null,
+  imageUrl: string | null,
+  folder: 'covers' | 'profiles' = 'covers',
 ): Promise<string | null> {
-  if (!photoUrl?.startsWith('data:')) return photoUrl;
+  if (!imageUrl?.startsWith('data:')) return imageUrl;
 
-  const trimmed = photoUrl.replace(/\s/g, '');
+  const trimmed = imageUrl.replace(/\s/g, '');
   const m = DATA_URL.exec(trimmed);
-  if (!m) return photoUrl;
+  if (!m) return imageUrl;
 
   let ext = m[1].toLowerCase();
   if (ext === 'jpeg') ext = 'jpg';
@@ -31,7 +32,7 @@ export async function remotePhotoUrl(
     throw new Error('Photo exceeds 5 MB after decode');
   }
 
-  const path = `covers/${randomUUID()}.${ext}`;
+  const path = `${folder}/${randomUUID()}.${ext}`;
   const contentType = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
 
   const { error } = await supabase.storage.from('pie-card-news').upload(path, buf, {
@@ -42,4 +43,12 @@ export async function remotePhotoUrl(
 
   const { data } = supabase.storage.from('pie-card-news').getPublicUrl(path);
   return data.publicUrl;
+}
+
+/** @deprecated Use remoteImageUrl */
+export async function remotePhotoUrl(
+  supabase: SupabaseClient,
+  photoUrl: string | null,
+): Promise<string | null> {
+  return remoteImageUrl(supabase, photoUrl, 'profiles');
 }

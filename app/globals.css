@@ -151,4 +151,410 @@
   html {
     @apply font-sans;
   }
+}@property --lgb-angle-1 {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: -75deg;
 }
+
+@property --lgb-angle-2 {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: -45deg;
+}
+
+/* ── Wrap ─────────────────────────────────────────────────────────────────── */
+.lgb-wrap {
+  position: relative;
+  z-index: 2;
+  border-radius: 999vw;
+  background: transparent;
+  pointer-events: none;
+  transition: all 400ms cubic-bezier(0.25, 1, 0.5, 1);
+  display: inline-flex;
+}
+
+/* ── Shadow ───────────────────────────────────────────────────────────────── */
+.lgb-shadow {
+  --lgb-shadow-fix: 1.5em;
+  position: absolute;
+  width: calc(100% + var(--lgb-shadow-fix));
+  height: calc(100% + var(--lgb-shadow-fix));
+  top: calc(0% - var(--lgb-shadow-fix) / 2);
+  left: calc(0% - var(--lgb-shadow-fix) / 2);
+  filter: blur(clamp(2px, 0.125em, 12px));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.lgb-shadow::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: 999vw;
+  background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.1));
+  width: calc(100% - var(--lgb-shadow-fix) - 0.25em);
+  height: calc(100% - var(--lgb-shadow-fix) - 0.25em);
+  top: calc(var(--lgb-shadow-fix) - 0.5em);
+  left: calc(var(--lgb-shadow-fix) - 0.875em);
+  padding: 0.125em;
+  box-sizing: border-box;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  transition: all 400ms cubic-bezier(0.25, 1, 0.5, 1);
+  opacity: 1;
+}
+
+/* ── Button ───────────────────────────────────────────────────────────────── */
+.lgb-wrap button,
+.lgb-wrap.lgb-pill .lgb-pill-inner {
+  --lgb-border: clamp(1px, 0.0625em, 4px);
+  all: unset;
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  pointer-events: auto;
+  z-index: 3;
+  background: linear-gradient(
+    -75deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.2),
+    rgba(255,255,255,0.05)
+  );
+  border-radius: 999vw;
+  box-shadow:
+    inset 0 0.125em 0.125em rgba(0,0,0,0.05),
+    inset 0 -0.125em 0.125em rgba(255,255,255,0.5),
+    0 0.25em 0.125em -0.125em rgba(0,0,0,0.2),
+    0 0 0.1em 0.25em inset rgba(255,255,255,0.2),
+    0 0 0 0 rgba(255,255,255,1);
+  backdrop-filter: blur(clamp(1px, 0.125em, 4px));
+  -webkit-backdrop-filter: blur(clamp(1px, 0.125em, 4px));
+  transition: all 400ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.lgb-wrap button:hover {
+  transform: scale(0.975);
+  backdrop-filter: blur(0.01em);
+  -webkit-backdrop-filter: blur(0.01em);
+  box-shadow:
+    inset 0 0.125em 0.125em rgba(0,0,0,0.05),
+    inset 0 -0.125em 0.125em rgba(255,255,255,0.5),
+    0 0.15em 0.05em -0.1em rgba(0,0,0,0.25),
+    0 0 0.05em 0.1em inset rgba(255,255,255,0.5),
+    0 0 0 0 rgba(255,255,255,1);
+}
+
+/* Active tilt */
+.lgb-wrap:has(button:active) {
+  transform: rotate3d(1, 0, 0, 25deg);
+}
+
+.lgb-wrap:has(button:active) button {
+  box-shadow:
+    inset 0 0.125em 0.125em rgba(0,0,0,0.05),
+    inset 0 -0.125em 0.125em rgba(255,255,255,0.5),
+    0 0.125em 0.125em -0.125em rgba(0,0,0,0.2),
+    0 0 0.1em 0.25em inset rgba(255,255,255,0.2),
+    0 0.225em 0.05em 0 rgba(0,0,0,0.05),
+    0 0.25em 0 0 rgba(255,255,255,0.75),
+    inset 0 0.25em 0.05em 0 rgba(0,0,0,0.15);
+}
+
+/* ── Button text span ─────────────────────────────────────────────────────── */
+.lgb-wrap button span,
+.lgb-wrap.lgb-pill .lgb-pill-inner span {
+  position: relative;
+  display: block;
+  user-select: none;
+  /* Explicit + !important: nav/utility classes must not fall back to system SF-looking stacks */
+  font-family: 'Noto Sans KR', ui-sans-serif, system-ui, sans-serif !important;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: rgba(40, 40, 40, 1);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0em 0.25em 0.05em rgba(0,0,0,0.1);
+  transition: all 400ms cubic-bezier(0.25, 1, 0.5, 1);
+  padding-inline: 1em;
+  padding-block: 0.55em;
+  white-space: nowrap;
+}
+
+.lgb-wrap button:hover span {
+  text-shadow: 0.025em 0.025em 0.025em rgba(0,0,0,0.12);
+}
+
+.lgb-wrap:has(button:active) span {
+  text-shadow: 0.025em 0.25em 0.05em rgba(0,0,0,0.12);
+}
+
+/* Shimmer overlay */
+.lgb-wrap button span::after,
+.lgb-wrap.lgb-pill .lgb-pill-inner span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  z-index: 3;
+  width: calc(100% - var(--lgb-border));
+  height: calc(100% - var(--lgb-border));
+  top: calc(0% + var(--lgb-border) / 2);
+  left: calc(0% + var(--lgb-border) / 2);
+  box-sizing: border-box;
+  border-radius: 999vw;
+  overflow: clip;
+  background: linear-gradient(
+    var(--lgb-angle-2),
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.5) 40% 50%,
+    rgba(255,255,255,0) 55%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  background-repeat: no-repeat;
+  transition:
+    background-position 500ms cubic-bezier(0.25, 1, 0.5, 1),
+    --lgb-angle-2 500ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.lgb-wrap button:hover span::after {
+  background-position: 25% 50%;
+}
+
+.lgb-wrap button:active span::after {
+  background-position: 50% 15%;
+  --lgb-angle-2: -15deg;
+}
+
+/* ── Conic border outline ─────────────────────────────────────────────────── */
+.lgb-wrap button::after,
+.lgb-wrap.lgb-pill .lgb-pill-inner::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: 999vw;
+  width: calc(100% + var(--lgb-border));
+  height: calc(100% + var(--lgb-border));
+  top: calc(0% - var(--lgb-border) / 2);
+  left: calc(0% - var(--lgb-border) / 2);
+  padding: var(--lgb-border);
+  box-sizing: border-box;
+  background: conic-gradient(
+      from var(--lgb-angle-1) at 50% 50%,
+      rgba(0,0,0,0.5),
+      rgba(0,0,0,0) 5% 40%,
+      rgba(0,0,0,0.5) 50%,
+      rgba(0,0,0,0) 60% 95%,
+      rgba(0,0,0,0.5)
+    ),
+    linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.5));
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  box-shadow: inset 0 0 0 calc(var(--lgb-border) / 2) rgba(255,255,255,0.5);
+  transition:
+    all 400ms cubic-bezier(0.25, 1, 0.5, 1),
+    --lgb-angle-1 500ms ease;
+}
+
+.lgb-wrap button:hover::after {
+  --lgb-angle-1: -125deg;
+}
+
+.lgb-wrap button:active::after {
+  --lgb-angle-1: -75deg;
+}
+
+/* Shadow on hover / active */
+.lgb-wrap:has(button:hover) .lgb-shadow {
+  filter: blur(clamp(2px, 0.0625em, 6px));
+  transition: filter 400ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.lgb-wrap:has(button:hover) .lgb-shadow::after {
+  top: calc(var(--lgb-shadow-fix) - 0.875em);
+}
+
+.lgb-wrap:has(button:active) .lgb-shadow::after {
+  top: calc(var(--lgb-shadow-fix) - 0.5em);
+  opacity: 0.75;
+}
+
+/* Touch devices — freeze angle animation */
+@media (hover: none) and (pointer: coarse) {
+  .lgb-wrap button span::after,
+  .lgb-wrap button:active span::after { --lgb-angle-2: -45deg; }
+  .lgb-wrap button::after,
+  .lgb-wrap button:hover::after,
+  .lgb-wrap button:active::after { --lgb-angle-1: -75deg; }
+}
+
+/* ── On-dark: real liquid-glass look without relying on backdrop-filter (broken under transformed ancestors, e.g. ESAT header translateY) ── */
+.lgb-wrap.lgb-on-dark button,
+.lgb-wrap.lgb-on-dark.lgb-pill .lgb-pill-inner {
+  /* Kill ineffective/minimal blur so we don’t stack misleading layers */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* Base frost + depth (simulates blurred dark hero through glass) */
+  background:
+    linear-gradient(
+      -75deg,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.07),
+      rgba(255, 255, 255, 0.16)
+    ),
+    linear-gradient(
+      180deg,
+      rgba(88, 96, 112, 0.42) 0%,
+      rgba(28, 32, 40, 0.52) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 2px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.lgb-wrap.lgb-on-dark button:hover {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transform: scale(0.975);
+  background:
+    linear-gradient(
+      -75deg,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(
+      180deg,
+      rgba(95, 104, 120, 0.38) 0%,
+      rgba(32, 36, 46, 0.48) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    0 3px 14px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.lgb-wrap.lgb-on-dark:has(button:active) button {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.32),
+    0 2px 8px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0.2em 0.05em 0 rgba(0, 0, 0, 0.15),
+    0 0.22em 0 0 rgba(255, 255, 255, 0.35),
+    inset 0 0.22em 0.06em 0 rgba(0, 0, 0, 0.18);
+}
+
+.lgb-wrap.lgb-on-dark button span,
+.lgb-wrap.lgb-on-dark.lgb-pill .lgb-pill-inner span {
+  font-family: 'Noto Sans KR', ui-sans-serif, system-ui, sans-serif !important;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow:
+    0 0.08em 0.18em rgba(0, 0, 0, 0.65),
+    0 0.02em 0.05em rgba(0, 0, 0, 0.55),
+    0 -0.02em 0.06em rgba(0, 0, 0, 0.45);
+}
+
+.lgb-wrap.lgb-on-dark button:hover span {
+  color: rgba(255, 255, 255, 1);
+  text-shadow:
+    0 0.1em 0.2em rgba(0, 0, 0, 0.55),
+    0 0.03em 0.06em rgba(0, 0, 0, 0.5),
+    0 -0.02em 0.08em rgba(0, 0, 0, 0.4);
+}
+
+.lgb-wrap.lgb-on-dark:has(button:active) span {
+  text-shadow:
+    0 0.06em 0.22em rgba(0, 0, 0, 0.58),
+    0 0.02em 0.05em rgba(0, 0, 0, 0.48);
+}
+
+/* Softer conic rim so it reads as glass edge, not a white sticker */
+.lgb-wrap.lgb-on-dark button::after,
+.lgb-wrap.lgb-on-dark.lgb-pill .lgb-pill-inner::after {
+  background: conic-gradient(
+      from var(--lgb-angle-1) at 50% 50%,
+      rgba(255, 255, 255, 0.45),
+      rgba(255, 255, 255, 0) 5% 40%,
+      rgba(255, 255, 255, 0.38) 50%,
+      rgba(255, 255, 255, 0) 60% 95%,
+      rgba(255, 255, 255, 0.45)
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.12));
+  box-shadow: inset 0 0 0 calc(var(--lgb-border) / 2) rgba(255, 255, 255, 0.28);
+}
+
+.lgb-wrap.lgb-on-dark .lgb-shadow::after {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.16));
+}
+
+/* Static pill — hero subcopy; no hover/active */
+.lgb-wrap.lgb-pill .lgb-pill-inner {
+  pointer-events: none;
+  cursor: default;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.lgb-wrap.lgb-pill .lgb-pill-inner span {
+  white-space: normal;
+  text-align: center;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  font-weight: 400;
+  padding-inline: 1.25em;
+  padding-block: 0.85em;
+  max-width: 32rem;
+}
+
+.lgb-wrap.lgb-pill.lgb-on-dark .lgb-pill-inner span {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Rectangular variant — hero CTAs, etc. */
+.lgb-wrap.lgb-rect {
+  --lgb-rect-radius: 0.25rem;
+  border-radius: var(--lgb-rect-radius);
+}
+
+.lgb-wrap.lgb-rect .lgb-shadow::after,
+.lgb-wrap.lgb-rect button,
+.lgb-wrap.lgb-rect button span::after,
+.lgb-wrap.lgb-rect button::after {
+  border-radius: var(--lgb-rect-radius);
+}
+
+.lgb-wrap.lgb-lg button span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  padding-inline: 1.125rem;
+  padding-block: 0.5em;
+}
+
+.lgb-wrap.lgb-sm button span {
+  font-size: 0.6875rem;
+  padding-inline: 0.8rem;
+  padding-block: 0.42rem;
+}
+
+.lgb-wrap button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.lgb-wrap:has(button:disabled) {
+  pointer-events: none;
+}
+
