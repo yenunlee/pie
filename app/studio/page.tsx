@@ -19,46 +19,44 @@ import StudioFooter from '@/app/components/StudioFooter';
 import { DEFAULT_DESIGN_SETTINGS, mergeDesignSettings } from '@/app/lib/constants';
 import { DEFAULT_EXPORT_SCALE } from '@/app/lib/export/capture-card-dom';
 import { applyParseResult, parsePieDocument } from '@/app/lib/parse-pie-document';
-import { loadStudioDraft, saveStudioDraft } from '@/app/lib/studio-draft';
+import { clearStudioDraft, loadStudioDraft, saveStudioDraft } from '@/app/lib/studio-draft';
+import type { EditionIdentity, SavedEdition } from '@/app/lib/edition-api';
 import { Button } from '@/components/ui/button';
 import { LiquidGlassButton } from '@/components/ui/liquid-glass-button';
 import '@/app/styles/a2g-fonts.css';
 
-const DEFAULT_STATE: AppState = {
-  global: {
-    volume: '63',
-    issueDate: '2026년 5월호',
-    intervieweeName: '유용재',
-    intervieweeAffiliation: '서울대학교 산업공학과 교수',
-    unitLabel: 'Unit:ie',
-    coverPhotoUrl: null,
-    photoUrl: null,
-  },
-  design: DEFAULT_DESIGN_SETTINGS,
-  abstract: {
-    text: '서울대학교 산업공학과 ==유용재 교수님==을 만났습니다.\n\n교수님은 생산 시스템, 스마트 제조, 그리고 ==인공지능==을 활용한 산업공학 연구에 매진하고 계십니다.\n\n이번 인터뷰에서는 교수님의 연구 여정과 산업공학의 미래에 대해 이야기를 나눠보았습니다.',
-  },
-  interview: {
-    messages: [
-      { id: generateId(), role: 'interviewer', content: '교수님, 안녕하세요! 간단한 자기소개 부탁드립니다.' },
-      { id: generateId(), role: 'interviewee', content: '안녕하세요. 저는 서울대학교 산업공학과에서 ==스마트 제조==와 생산 시스템을 연구하고 있는 유용재입니다.' },
-      { id: generateId(), role: 'interviewer', content: '산업공학을 선택하시게 된 계기가 무엇인가요?' },
-      { id: generateId(), role: 'interviewee', content: '학부 때 수학과 공학을 모두 좋아했는데, 산업공학이 두 분야를 잘 융합하고 있다는 점에서 매력을 느꼈습니다. 특히 ==실제 문제를 해결==하는 데 있어 강력한 도구를 제공한다는 점이 좋았습니다.' },
-    ],
-    pageBreaksAfter: [],
-  },
-};
+function createDefaultState(): AppState {
+  return {
+    global: {
+      volume: '63',
+      issueDate: '2026년 5월호',
+      intervieweeName: '유용재',
+      intervieweeAffiliation: '서울대학교 산업공학과 교수',
+      unitLabel: 'Unit:ie',
+      coverPhotoUrl: null,
+      photoUrl: null,
+    },
+    design: DEFAULT_DESIGN_SETTINGS,
+    abstract: {
+      text: '서울대학교 산업공학과 ==유용재 교수님==을 만났습니다.\n\n교수님은 생산 시스템, 스마트 제조, 그리고 ==인공지능==을 활용한 산업공학 연구에 매진하고 계십니다.\n\n이번 인터뷰에서는 교수님의 연구 여정과 산업공학의 미래에 대해 이야기를 나눠보았습니다.',
+    },
+    interview: {
+      messages: [
+        { id: generateId(), role: 'interviewer', content: '교수님, 안녕하세요! 간단한 자기소개 부탁드립니다.' },
+        { id: generateId(), role: 'interviewee', content: '안녕하세요. 저는 서울대학교 산업공학과에서 ==스마트 제조==와 생산 시스템을 연구하고 있는 유용재입니다.' },
+        { id: generateId(), role: 'interviewer', content: '산업공학을 선택하시게 된 계기가 무엇인가요?' },
+        { id: generateId(), role: 'interviewee', content: '학부 때 수학과 공학을 모두 좋아했는데, 산업공학이 두 분야를 잘 융합하고 있다는 점에서 매력을 느꼈습니다. 특히 ==실제 문제를 해결==하는 데 있어 강력한 도구를 제공한다는 점이 좋았습니다.' },
+      ],
+      pageBreaksAfter: [],
+    },
+  };
+}
 
 const INITIAL_STEP_STATUS: Record<StudioStep, 'idle' | 'loading' | 'done' | 'error'> = {
   1: 'idle',
   2: 'idle',
   3: 'idle',
 };
-
-function readInitialState(): AppState {
-  if (typeof window === 'undefined') return DEFAULT_STATE;
-  return loadStudioDraft() ?? DEFAULT_STATE;
-}
 
 function insertMessageAfter(
   messages: AppState['interview']['messages'],
@@ -73,13 +71,14 @@ function insertMessageAfter(
 }
 
 export default function Home() {
-  const [state, setState] = useState<AppState>(readInitialState);
+  const [state, setState] = useState<AppState>(createDefaultState);
   const [isExporting, setIsExporting] = useState(false);
   const [stylePanelOpen, setStylePanelOpen] = useState(false);
   const [libraryPanelOpen, setLibraryPanelOpen] = useState(false);
   const [metadataPanelOpen, setMetadataPanelOpen] = useState(false);
   const [formatGuideOpen, setFormatGuideOpen] = useState(false);
   const [cloudSaveConfigured, setCloudSaveConfigured] = useState(false);
+  const [currentEdition, setCurrentEdition] = useState<EditionIdentity | null>(null);
 
   const [importText, setImportText] = useState('');
   const [importHtml, setImportHtml] = useState<string | undefined>();
@@ -97,6 +96,15 @@ export default function Home() {
       .then(r => r.json())
       .then((j: { enabled?: boolean }) => setCloudSaveConfigured(Boolean(j.enabled)))
       .catch(() => setCloudSaveConfigured(false));
+  }, []);
+
+  useEffect(() => {
+    const draft = loadStudioDraft();
+    if (!draft) return;
+    setState(draft);
+    setViewedStep(2);
+    setCurrentStep(2);
+    setStepStatus({ ...INITIAL_STEP_STATUS, 1: 'done', 2: 'done' });
   }, []);
 
   useEffect(() => {
@@ -246,6 +254,43 @@ export default function Home() {
     setStepStatus(s => ({ ...s, 2: s[2] === 'done' ? 'done' : 'idle' }));
   }, []);
 
+  const handleLibraryLoad = useCallback((edition: SavedEdition) => {
+    setState(edition.state);
+    setCurrentEdition({
+      id: edition.id,
+      title: edition.title,
+      updated_at: edition.updated_at,
+    });
+    setImportText('');
+    setImportHtml(undefined);
+    setParseError(null);
+    setParseWarning(null);
+    setParseSummary(null);
+    setExportError(null);
+    setStylePanelOpen(false);
+    setMetadataPanelOpen(false);
+    setStepStatus({ ...INITIAL_STEP_STATUS, 1: 'done', 2: 'done' });
+    setCurrentStep(2);
+    setViewedStep(2);
+  }, []);
+
+  const handleNewProject = useCallback(() => {
+    clearStudioDraft();
+    setState(createDefaultState());
+    setCurrentEdition(null);
+    setImportText('');
+    setImportHtml(undefined);
+    setParseError(null);
+    setParseWarning(null);
+    setParseSummary(null);
+    setExportError(null);
+    setStylePanelOpen(false);
+    setMetadataPanelOpen(false);
+    setStepStatus({ ...INITIAL_STEP_STATUS });
+    setCurrentStep(1);
+    setViewedStep(1);
+  }, []);
+
   const handleParse = () => {
     setParseError(null);
     setParseWarning(null);
@@ -263,6 +308,7 @@ export default function Home() {
       }
 
       setState(prev => applyParseResult(prev, result));
+      setCurrentEdition(null);
       setStepStatus(s => ({ ...s, 1: 'done', 2: 'idle' }));
       setCurrentStep(2);
       setParseSummary(
@@ -320,6 +366,9 @@ export default function Home() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h1 className="text-xl font-semibold text-gray-900">파이 카뉴 공장</h1>
+              <p className="mt-1 text-xs text-gray-400">
+                {currentEdition ? `Saved: ${currentEdition.title}` : 'Unsaved draft'}
+              </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               {isEditView && (
@@ -444,6 +493,25 @@ export default function Home() {
 
               <aside className="space-y-4">
                 <div className="rounded-3xl border border-gray-100 bg-white px-4 py-4 shadow-sm">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">Library</p>
+                  <p className="mt-1 text-xs leading-5 text-gray-400">
+                    저장해둔 카드뉴스 파일을 바로 열어 이어서 작업합니다.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLibraryPanelOpen(true)}
+                    className="mt-3 h-9 w-full rounded-2xl border-gray-200 text-xs font-medium text-gray-700"
+                  >
+                    Browse saved files
+                  </Button>
+                  <p className="mt-2 text-[10px] text-gray-300">
+                    {cloudSaveConfigured ? 'Cloud library ready' : 'Supabase 연결 시 활성화됩니다'}
+                  </p>
+                </div>
+
+                <div className="rounded-3xl border border-gray-100 bg-white px-4 py-4 shadow-sm">
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">Quick metadata</p>
                   <p className="mt-1 text-xs leading-5 text-gray-400">
                     표지와 초록 제목에 들어갈 기본 정보를 미리 채웁니다.
@@ -546,7 +614,10 @@ export default function Home() {
         open={libraryPanelOpen}
         onClose={() => setLibraryPanelOpen(false)}
         snapshot={{ ...state, design }}
-        onLoad={next => setState(next)}
+        currentEdition={currentEdition}
+        onSaved={setCurrentEdition}
+        onLoad={handleLibraryLoad}
+        onNewProject={handleNewProject}
       />
       <ParserFormatDialog open={formatGuideOpen} onClose={() => setFormatGuideOpen(false)} />
 

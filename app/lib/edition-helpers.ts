@@ -13,6 +13,29 @@ export function normalizeStateForPersist(state: AppState): AppState {
   };
 }
 
+export function normalizeEditionTitle(title: unknown, state: AppState): string {
+  const titleRaw = typeof title === 'string' ? title.trim().slice(0, 240) : '';
+  return titleRaw !== '' ? titleRaw : `PIE vol.${state.global.volume || '?'}`.trim();
+}
+
+export async function prepareEditionStateForPersist(
+  supabase: SupabaseClient,
+  state: AppState,
+): Promise<AppState> {
+  let normalized = normalizeStateForPersist(state);
+  const [coverPhotoUrl, photoUrl] = await Promise.all([
+    remoteImageUrl(supabase, normalized.global.coverPhotoUrl, 'covers'),
+    remoteImageUrl(supabase, normalized.global.photoUrl, 'profiles'),
+  ]);
+
+  normalized = {
+    ...normalized,
+    global: { ...normalized.global, coverPhotoUrl, photoUrl },
+  };
+
+  return normalized;
+}
+
 /** Upload legacy data-URL images to Storage; returns https public URL or original if already remote/null. */
 export async function remoteImageUrl(
   supabase: SupabaseClient,

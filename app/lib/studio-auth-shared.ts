@@ -55,3 +55,18 @@ export async function isValidSessionToken(token: string | undefined): Promise<bo
     return false;
   }
 }
+
+function getCookieValue(cookieHeader: string | null, name: string): string | undefined {
+  if (!cookieHeader) return undefined;
+  const prefix = `${name}=`;
+  return cookieHeader
+    .split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith(prefix))
+    ?.slice(prefix.length);
+}
+
+export async function isValidStudioRequest(request: Request): Promise<boolean> {
+  const token = getCookieValue(request.headers.get('cookie'), STUDIO_AUTH_COOKIE);
+  return isValidSessionToken(token);
+}

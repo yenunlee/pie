@@ -110,7 +110,7 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
                 max={40}
                 className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                 value={d.abstractTitleFontSize}
-                onChange={e => updateDesign('abstractTitleFontSize', Number(e.target.value) || 26)}
+                onChange={e => updateDesign('abstractTitleFontSize', Number(e.target.value) || 33)}
               />
             </div>
             <div className="space-y-1">
@@ -122,7 +122,7 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
                 step={100}
                 className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                 value={d.abstractTitleFontWeight}
-                onChange={e => updateDesign('abstractTitleFontWeight', Number(e.target.value) || 700)}
+                onChange={e => updateDesign('abstractTitleFontWeight', Number(e.target.value) || 800)}
               />
             </div>
             <div className="col-span-2 flex items-center gap-2 py-1">
@@ -142,10 +142,10 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
               <input
                 type="number"
                 min={16}
-                max={36}
+                max={40}
                 className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                 value={d.abstractTextSize}
-                onChange={e => updateDesign('abstractTextSize', Number(e.target.value) || 24)}
+                onChange={e => updateDesign('abstractTextSize', Number(e.target.value) || 30)}
               />
             </div>
             <div className="space-y-1">
@@ -185,7 +185,7 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
               />
             </div>
             <div className="col-span-2 space-y-1">
-              <Label className="text-xs text-gray-500">하이라이트(H) 색 · 하단 구분선</Label>
+              <Label className="text-xs text-gray-500">하이라이트(H) 색</Label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -209,17 +209,6 @@ export default function AdvancedStyleEditor({ design, onDesignChange }: Advanced
                 className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                 value={d.abstractTitleMarginBottom}
                 onChange={e => updateDesign('abstractTitleMarginBottom', Number(e.target.value) || 40)}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-gray-500">하단 레이블 글자</Label>
-              <input
-                type="number"
-                min={12}
-                max={28}
-                className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                value={d.abstractFooterLabelFontSize}
-                onChange={e => updateDesign('abstractFooterLabelFontSize', Number(e.target.value) || 20)}
               />
             </div>
             <div className="space-y-1">

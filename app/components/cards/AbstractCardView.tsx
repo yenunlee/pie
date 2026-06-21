@@ -1,6 +1,6 @@
 import React from 'react';
 import { DesignSettings, GlobalSettings } from '@/app/lib/types';
-import { COLORS, DEFAULT_DESIGN_SETTINGS } from '@/app/lib/constants';
+import { COLORS, DEFAULT_DESIGN_SETTINGS, ABSTRACT_CARD_BACKGROUND } from '@/app/lib/constants';
 
 function plainExportText(value: string): string {
   return value.replace(/\*\*|==/g, '');
@@ -28,7 +28,7 @@ export default function AbstractCardView({
       style={{
         width: '100%',
         height: '100%',
-        backgroundColor: '#ffffff',
+        background: ABSTRACT_CARD_BACKGROUND,
         padding: `${d.abstractCardPaddingTop}px ${d.abstractCardPaddingX}px`,
         display: 'flex',
         flexDirection: 'column',
@@ -67,27 +67,6 @@ export default function AbstractCardView({
         }}
       >
         {plainExportText(bodyText)}
-      </div>
-
-      <div
-        style={{
-          marginTop: 40,
-          borderTop: `3px solid ${d.abstractHighlightColor}`,
-          paddingTop: 20,
-          display: 'flex',
-          justifyContent: 'flex-end',
-        }}
-      >
-        <span
-          style={{
-            fontSize: d.abstractFooterLabelFontSize,
-            fontWeight: 700,
-            color: COLORS.textSecondary,
-            letterSpacing: '0.05em',
-          }}
-        >
-          People in IE
-        </span>
       </div>
     </div>
   );

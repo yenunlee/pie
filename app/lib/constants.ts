@@ -12,6 +12,7 @@ export const COLORS = {
   intervieweeBubble: '#F1F2F4',
   intervieweeBubbleBorder: '#E3E5E8',
   coverGradientEnd: '#D6E8F7',
+  abstractGradientEnd: '#DBEAF6',
   textPrimary: '#1a1a1a',
   textSecondary: '#555555',
   textMuted: '#888888',
@@ -24,9 +25,11 @@ export const FONTS = {
 export const CARD_PADDING = 64;
 export const INTERVIEW_CARD_CONTENT_HEIGHT = CARD_HEIGHT - CARD_PADDING * 2;
 
+export const ABSTRACT_CARD_BACKGROUND = `linear-gradient(180deg, #ffffff 0%, #f8fbfe 48%, ${COLORS.abstractGradientEnd} 100%)`;
+
 export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   coverTextSize: 100,
-  abstractTextSize: 24,
+  abstractTextSize: 30,
   interviewTextSize: 26,
   interviewerBubbleColor: '#DDEEFF',
   intervieweeBubbleColor: '#F1F2F4',
@@ -37,8 +40,8 @@ export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   interviewContentPaddingBottom: 32,
   interviewBubblePaddingY: 18,
   interviewBubblePaddingX: 22,
-  abstractTitleFontSize: 26,
-  abstractTitleFontWeight: 700,
+  abstractTitleFontSize: 33,
+  abstractTitleFontWeight: 800,
   abstractTitleUnderline: true,
   abstractBodyFontWeight: 400,
   abstractBoldFontWeight: 800,
@@ -68,7 +71,7 @@ export const DESIGN_PRESETS: Array<{ name: string; settings: Partial<DesignSetti
     name: 'Clean',
     settings: {
       coverTextSize: 98,
-      abstractTextSize: 24,
+      abstractTextSize: 30,
       interviewTextSize: 25,
       interviewerBubbleColor: '#EAF4FF',
       intervieweeBubbleColor: '#F3F4F6',
@@ -79,7 +82,7 @@ export const DESIGN_PRESETS: Array<{ name: string; settings: Partial<DesignSetti
     name: 'Bold',
     settings: {
       coverTextSize: 108,
-      abstractTextSize: 26,
+      abstractTextSize: 30,
       interviewTextSize: 28,
       interviewerBubbleColor: '#D7EAFF',
       intervieweeBubbleColor: '#ECEFF3',
