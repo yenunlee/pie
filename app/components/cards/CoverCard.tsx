@@ -14,7 +14,7 @@ export default function CoverCard({ settings, design = DEFAULT_DESIGN_SETTINGS }
   const textScale = effectiveDesign.coverTextSize / DEFAULT_DESIGN_SETTINGS.coverTextSize;
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+    <div className="card-news-font" style={{ width: '100%', height: '100%', position: 'relative', backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
       {/* Masthead */}
       <div style={{ padding: '78px 96px 0 96px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontSize: 40 * textScale, fontWeight: 700, color: '#111111', letterSpacing: '-0.02em', marginBottom: 16 }}>

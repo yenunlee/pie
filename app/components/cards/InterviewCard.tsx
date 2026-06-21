@@ -42,6 +42,7 @@ export default function InterviewCard({
 
   return (
     <div
+      className="card-news-font"
       onClick={editable ? onClearSelection : undefined}
       style={{
       width: '100%',

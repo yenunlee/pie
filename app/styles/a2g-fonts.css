@@ -1,0 +1,61 @@
+@font-face {
+  font-family: 'A2G';
+  src: url('/fonts/에이투지체-4Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'A2G';
+  src: url('/fonts/에이투지체-5Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'A2G';
+  src: url('/fonts/에이투지체-7Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'A2G';
+  src: url('/fonts/에이투지체-8ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'A2G';
+  src: url('/fonts/에이투지체-9Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/** Instructional / chrome UI (landing, studio panels, nav). */
+.a2g-ui {
+  font-family: 'A2G', 'Noto Sans KR', sans-serif;
+}
+
+/** Card news preview & export — keep publication typography. */
+.card-news-font {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.card-news-font * {
+  font-family: inherit;
+}
+
+/** Liquid glass buttons inside A2G UI shells. */
+.a2g-ui .lgb-wrap button span,
+.a2g-ui .lgb-wrap.lgb-pill .lgb-pill-inner span,
+.a2g-ui .lgb-wrap.lgb-on-dark button span,
+.a2g-ui .lgb-wrap.lgb-on-dark.lgb-pill .lgb-pill-inner span {
+  font-family: 'A2G', 'Noto Sans KR', sans-serif !important;
+}

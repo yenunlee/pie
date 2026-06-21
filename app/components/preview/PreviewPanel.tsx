@@ -59,7 +59,10 @@ export default function PreviewPanel({ state, interviewPages, showHeader = true 
             className="relative overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5"
             style={{ width: CARD_WIDTH * PREVIEW_SCALE, height: CARD_HEIGHT * PREVIEW_SCALE }}
           >
-            <div style={{ transform: `scale(${PREVIEW_SCALE})`, transformOrigin: 'top left', width: CARD_WIDTH, height: CARD_HEIGHT }}>
+            <div
+              className="card-news-font"
+              style={{ transform: `scale(${PREVIEW_SCALE})`, transformOrigin: 'top left', width: CARD_WIDTH, height: CARD_HEIGHT }}
+            >
               {c.type === 'cover' && <CoverCard settings={state.global} design={state.design} />}
               {c.type === 'abstract' && <AbstractCard settings={state.global} text={state.abstract.text} design={state.design} />}
               {c.type === 'interview' && (

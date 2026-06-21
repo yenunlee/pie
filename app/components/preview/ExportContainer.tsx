@@ -21,10 +21,10 @@ function ExportSlot({ id, children }: { id: string; children: React.ReactNode })
   return (
     <div
       id={id}
+      className="card-news-font"
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
-        fontFamily: "var(--font-noto-sans-kr), 'Noto Sans KR', sans-serif",
         position: 'relative',
         overflow: 'hidden',
         backgroundColor: '#ffffff',

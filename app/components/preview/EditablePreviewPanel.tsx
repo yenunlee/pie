@@ -172,6 +172,7 @@ export default function EditablePreviewPanel({
               style={{ width: CARD_WIDTH * PREVIEW_SCALE, height: CARD_HEIGHT * PREVIEW_SCALE }}
             >
               <div
+                className="card-news-font"
                 style={{
                   transform: `scale(${PREVIEW_SCALE})`,
                   transformOrigin: 'top left',
